@@ -53,7 +53,7 @@ class AuthService {
 
     try {
       await _usuarios.doc(usuario.uid).set({
-        'nome': nome.trim(),
+        'nome': _nomeComIniciais(nome),
         'cpf': somenteDigitos(cpf),
         'telefone': somenteDigitos(telefone),
         'email': email.trim().toLowerCase(),
@@ -69,6 +69,19 @@ class AuthService {
       await usuario.delete();
       rethrow;
     }
+  }
+
+  /// "fabricio  andrade de araujo" -> "Fabricio Andrade de Araujo"
+  static String _nomeComIniciais(String nome) {
+    const minusculas = {'da', 'das', 'de', 'do', 'dos', 'e'};
+    return nome
+        .trim()
+        .toLowerCase()
+        .split(RegExp(r'\s+'))
+        .map((parte) => minusculas.contains(parte)
+            ? parte
+            : parte[0].toUpperCase() + parte.substring(1))
+        .join(' ');
   }
 
   // ---------- Ações do programador ----------
