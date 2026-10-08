@@ -79,6 +79,10 @@ class _CadastroMotoristaScreenState extends State<CadastroMotoristaScreen> {
         _erroCategoria != null ||
         _erroValidade != null ||
         _erroTermos != null) {
+      // Avisa, porque o campo com erro pode estar fora da tela.
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Confira os campos marcados em vermelho.'),
+      ));
       return;
     }
 
@@ -133,6 +137,10 @@ class _CadastroMotoristaScreenState extends State<CadastroMotoristaScreen> {
         child: AreaCentral(
           child: Form(
             key: _form,
+            // Depois da primeira tentativa, o erro some assim que o campo é corrigido.
+            autovalidateMode: _tentouEnviar
+                ? AutovalidateMode.onUserInteraction
+                : AutovalidateMode.disabled,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
               children: [
