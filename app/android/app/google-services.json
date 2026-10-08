@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "302942709039",
+    "project_id": "carga-justa",
+    "storage_bucket": "carga-justa.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:302942709039:android:d5e0dc4498730e43ef2dda",
+        "android_client_info": {
+          "package_name": "br.com.cargajusta.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDFnARYAm_CKWGdHgU5VGpJJC_mTF6FbRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
