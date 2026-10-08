@@ -1,0 +1,46 @@
+rules_version = '2';
+
+// Regras de segurança do banco. Copie este conteúdo para a aba
+// "Regras" do Firestore no console do Firebase e clique em "Publicar".
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function logado() {
+      return request.auth != null;
+    }
+
+    function caminhoDoMeuCadastro() {
+      return /databases/$(database)/documents/usuarios/$(request.auth.uid);
+    }
+
+    // Programador ou administrador com cadastro aprovado.
+    function ehGestor() {
+      return logado()
+        && exists(caminhoDoMeuCadastro())
+        && get(caminhoDoMeuCadastro()).data.perfil in ['programador', 'administrador']
+        && get(caminhoDoMeuCadastro()).data.status == 'aprovado';
+    }
+
+    match /usuarios/{uid} {
+      // Cada um lê o próprio cadastro; o programador lê todos.
+      allow read: if (logado() && request.auth.uid == uid) || ehGestor();
+
+      // Cadastro novo: só para si mesmo, sempre como motorista pendente.
+      // Assim ninguém consegue se cadastrar direto como programador.
+      allow create: if logado()
+        && request.auth.uid == uid
+        && request.resource.data.perfil == 'motorista'
+        && request.resource.data.status == 'pendente';
+
+      // O programador aprova e recusa. O motorista pode mudar os próprios
+      // dados, mas nunca o perfil, o status, o CPF ou quem aprovou.
+      allow update: if ehGestor()
+        || (logado()
+            && request.auth.uid == uid
+            && !request.resource.data.diff(resource.data).affectedKeys()
+                 .hasAny(['perfil', 'status', 'cpf', 'avaliadoPor', 'avaliadoEm', 'motivoRecusa']));
+
+      allow delete: if false;
+    }
+  }
+}
