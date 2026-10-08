@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import '../tema.dart';
 import '../utils/mensagens_erro.dart';
 import '../utils/validadores.dart';
 import '../widgets/area_central.dart';
+import '../widgets/marca.dart';
+import '../widgets/quadro.dart';
 import 'cadastro_motorista_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -63,91 +66,103 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final tema = Theme.of(context);
-
     return Scaffold(
       body: SafeArea(
         child: AreaCentral(
+          larguraMaxima: 420,
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _form,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Icon(Icons.local_shipping_outlined,
-                      size: 64, color: tema.colorScheme.primary),
-                  const SizedBox(height: 12),
-                  Text('Carga Justa',
-                      textAlign: TextAlign.center,
-                      style: tema.textTheme.headlineMedium),
-                  const SizedBox(height: 4),
-                  Text('Distribuição de cargas',
-                      textAlign: TextAlign.center,
-                      style: tema.textTheme.bodyMedium),
-                  const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _email,
-                    decoration: const InputDecoration(labelText: 'E-mail'),
-                    keyboardType: TextInputType.emailAddress,
-                    autofillHints: const [AutofillHints.email],
-                    textInputAction: TextInputAction.next,
-                    validator: validarEmail,
-                  ),
-                  const SizedBox(height: 16),
-                  TextFormField(
-                    controller: _senha,
-                    decoration: InputDecoration(
-                      labelText: 'Senha',
-                      suffixIcon: IconButton(
-                        tooltip: _senhaVisivel ? 'Esconder senha' : 'Mostrar senha',
-                        icon: Icon(_senhaVisivel
-                            ? Icons.visibility_off
-                            : Icons.visibility),
-                        onPressed: () =>
-                            setState(() => _senhaVisivel = !_senhaVisivel),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Center(child: Marca(tamanho: 26)),
+                const SizedBox(height: 6),
+                const Text(
+                  'Distribuição de cargas',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Cores.textoSuave),
+                ),
+                const SizedBox(height: 28),
+                Quadro(
+                  titulo: 'Acesso ao sistema',
+                  escuro: true,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Form(
+                      key: _form,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextFormField(
+                            controller: _email,
+                            decoration:
+                                const InputDecoration(labelText: 'E-mail'),
+                            keyboardType: TextInputType.emailAddress,
+                            autofillHints: const [AutofillHints.email],
+                            textInputAction: TextInputAction.next,
+                            validator: validarEmail,
+                          ),
+                          const SizedBox(height: 14),
+                          TextFormField(
+                            controller: _senha,
+                            decoration: InputDecoration(
+                              labelText: 'Senha',
+                              suffixIcon: IconButton(
+                                tooltip: _senhaVisivel
+                                    ? 'Esconder senha'
+                                    : 'Mostrar senha',
+                                icon: Icon(_senhaVisivel
+                                    ? Icons.visibility_off
+                                    : Icons.visibility),
+                                onPressed: () => setState(
+                                    () => _senhaVisivel = !_senhaVisivel),
+                              ),
+                            ),
+                            obscureText: !_senhaVisivel,
+                            autofillHints: const [AutofillHints.password],
+                            textInputAction: TextInputAction.done,
+                            onFieldSubmitted: (_) => _entrar(),
+                            validator: validarSenha,
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: _carregando ? null : _recuperarSenha,
+                              child: const Text('Esqueci minha senha'),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          FilledButton(
+                            onPressed: _carregando ? null : _entrar,
+                            child: _carregando
+                                ? const SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2, color: Colors.white),
+                                  )
+                                : const Text('ENTRAR'),
+                          ),
+                        ],
                       ),
                     ),
-                    obscureText: !_senhaVisivel,
-                    autofillHints: const [AutofillHints.password],
-                    textInputAction: TextInputAction.done,
-                    onFieldSubmitted: (_) => _entrar(),
-                    validator: validarSenha,
                   ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: _carregando ? null : _recuperarSenha,
-                      child: const Text('Esqueci minha senha'),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  FilledButton(
-                    onPressed: _carregando ? null : _entrar,
-                    child: _carregando
-                        ? const SizedBox(
-                            width: 22,
-                            height: 22,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Entrar'),
-                  ),
-                  const SizedBox(height: 32),
-                  const Divider(),
-                  const SizedBox(height: 16),
-                  Text('Motorista sem cadastro?',
-                      textAlign: TextAlign.center,
-                      style: tema.textTheme.bodyMedium),
-                  const SizedBox(height: 8),
-                  OutlinedButton(
-                    onPressed: _carregando
-                        ? null
-                        : () => Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => const CadastroMotoristaScreen())),
-                    child: const Text('Criar cadastro de motorista'),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Motorista sem cadastro?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Cores.textoSuave),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: _carregando
+                      ? null
+                      : () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => const CadastroMotoristaScreen())),
+                  child: const Text('CRIAR CADASTRO DE MOTORISTA'),
+                ),
+              ],
             ),
           ),
         ),
